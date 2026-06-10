@@ -9,6 +9,9 @@ public class PalpiteRequestDTO {
 
     private Long participanteBolaoId;
     private Long jogoId;
+
     private Integer golsCasaPalpite;
     private Integer golsVisitantePalpite;
+
+    private Long classificadoPalpiteId;
 }

@@ -3,6 +3,8 @@ package com.bolao.copa2026.model;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,9 +34,16 @@ public class Jogo {
 
     private Integer golsVisitante;
 
+    private Integer penaltisCasa;
+
+    private Integer penaltisVisitante;
+
     private LocalDateTime dataHora;
 
-    private String fase;
+    @Enumerated(EnumType.STRING)
+    private FaseCopa fase;
+
+    private String grupo;
 
     private Boolean finalizado = false;
 }

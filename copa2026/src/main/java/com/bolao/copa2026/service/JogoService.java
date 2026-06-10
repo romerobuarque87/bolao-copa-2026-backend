@@ -1,6 +1,8 @@
 package com.bolao.copa2026.service;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -10,6 +12,7 @@ import com.bolao.copa2026.exception.BusinessException;
 import com.bolao.copa2026.exception.ResourceNotFoundException;
 import com.bolao.copa2026.model.ConfiguracaoPontuacao;
 import com.bolao.copa2026.model.Estadio;
+import com.bolao.copa2026.model.FaseCopa;
 import com.bolao.copa2026.model.Jogo;
 import com.bolao.copa2026.model.Palpite;
 import com.bolao.copa2026.model.ParticipanteBolao;
@@ -62,10 +65,12 @@ public class JogoService {
         jogo.setTimeVisitante(timeVisitante);
         jogo.setEstadio(estadio);
         jogo.setDataHora(request.getDataHora());
-        jogo.setFase(request.getFase());
+        jogo.setFase(converterFase(request.getFase()));
         jogo.setFinalizado(false);
         jogo.setGolsCasa(null);
         jogo.setGolsVisitante(null);
+        jogo.setPenaltisCasa(null);
+        jogo.setPenaltisVisitante(null);
 
         Jogo jogoSalvo = jogoRepository.save(jogo);
 
@@ -79,6 +84,38 @@ public class JogoService {
                 .toList();
     }
 
+    public List<JogoResponseDTO> listarFaseDeGrupos() {
+        return jogoRepository.findByFaseOrderByDataHoraAsc(FaseCopa.GRUPOS)
+                .stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
+    public List<JogoResponseDTO> listarPorGrupo(String grupo) {
+        return jogoRepository.findByFaseAndGrupoOrderByDataHoraAsc(
+                        FaseCopa.GRUPOS,
+                        grupo.toUpperCase()
+                )
+                .stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
+    public Map<String, List<JogoResponseDTO>> listarAgrupadosPorGrupo() {
+        Map<String, List<JogoResponseDTO>> jogosPorGrupo = new LinkedHashMap<>();
+
+        String[] grupos = {
+                "A", "B", "C", "D", "E", "F",
+                "G", "H", "I", "J", "K", "L"
+        };
+
+        for (String grupo : grupos) {
+            jogosPorGrupo.put(grupo, listarPorGrupo(grupo));
+        }
+
+        return jogosPorGrupo;
+    }
+
     public JogoResponseDTO buscarPorId(Long id) {
         Jogo jogo = jogoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Jogo não encontrado"));
@@ -87,7 +124,13 @@ public class JogoService {
     }
 
     @Transactional
-    public JogoResponseDTO finalizarJogo(Long jogoId, Integer golsCasa, Integer golsVisitante) {
+    public JogoResponseDTO finalizarJogo(
+            Long jogoId,
+            Integer golsCasa,
+            Integer golsVisitante,
+            Integer penaltisCasa,
+            Integer penaltisVisitante
+    ) {
         Jogo jogo = jogoRepository.findById(jogoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Jogo não encontrado"));
 
@@ -95,8 +138,12 @@ public class JogoService {
             throw new BusinessException("Este jogo já foi finalizado");
         }
 
+        validarResultadoMataMata(jogo, golsCasa, golsVisitante, penaltisCasa, penaltisVisitante);
+
         jogo.setGolsCasa(golsCasa);
         jogo.setGolsVisitante(golsVisitante);
+        jogo.setPenaltisCasa(penaltisCasa);
+        jogo.setPenaltisVisitante(penaltisVisitante);
         jogo.setFinalizado(true);
 
         Jogo jogoSalvo = jogoRepository.save(jogo);
@@ -107,7 +154,13 @@ public class JogoService {
     }
 
     @Transactional
-    public JogoResponseDTO corrigirResultado(Long jogoId, Integer golsCasa, Integer golsVisitante) {
+    public JogoResponseDTO corrigirResultado(
+            Long jogoId,
+            Integer golsCasa,
+            Integer golsVisitante,
+            Integer penaltisCasa,
+            Integer penaltisVisitante
+    ) {
         Jogo jogo = jogoRepository.findById(jogoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Jogo não encontrado"));
 
@@ -115,10 +168,14 @@ public class JogoService {
             throw new BusinessException("Só é possível corrigir um jogo já finalizado");
         }
 
+        validarResultadoMataMata(jogo, golsCasa, golsVisitante, penaltisCasa, penaltisVisitante);
+
         estornarPontuacaoDosPalpites(jogo);
 
         jogo.setGolsCasa(golsCasa);
         jogo.setGolsVisitante(golsVisitante);
+        jogo.setPenaltisCasa(penaltisCasa);
+        jogo.setPenaltisVisitante(penaltisVisitante);
         jogo.setFinalizado(true);
 
         Jogo jogoSalvo = jogoRepository.save(jogo);
@@ -126,6 +183,34 @@ public class JogoService {
         calcularPontuacaoDosPalpites(jogoSalvo);
 
         return toResponseDTO(jogoSalvo);
+    }
+
+    private void validarResultadoMataMata(
+            Jogo jogo,
+            Integer golsCasa,
+            Integer golsVisitante,
+            Integer penaltisCasa,
+            Integer penaltisVisitante
+    ) {
+        if (golsCasa == null || golsVisitante == null) {
+            throw new BusinessException("Informe os gols dos dois times");
+        }
+
+        if (jogo.getFase() == FaseCopa.GRUPOS) {
+            return;
+        }
+
+        if (!golsCasa.equals(golsVisitante)) {
+            return;
+        }
+
+        if (penaltisCasa == null || penaltisVisitante == null) {
+            throw new BusinessException("Jogo de mata-mata empatado precisa informar os pênaltis");
+        }
+
+        if (penaltisCasa.equals(penaltisVisitante)) {
+            throw new BusinessException("Disputa de pênaltis não pode terminar empatada");
+        }
     }
 
     private void calcularPontuacaoDosPalpites(Jogo jogo) {
@@ -169,11 +254,15 @@ public class JogoService {
                 jogo.getGolsCasa().equals(palpite.getGolsCasaPalpite()) &&
                 jogo.getGolsVisitante().equals(palpite.getGolsVisitantePalpite());
 
-        if (placarExato) {
+        if (placarExato && jogo.getFase() == FaseCopa.GRUPOS) {
             return config.getPontosPlacarExato();
         }
 
         int pontos = 0;
+
+        if (placarExato) {
+            pontos += config.getPontosPlacarExato();
+        }
 
         if (acertouResultado(jogo, palpite)) {
             pontos += config.getPontosResultado();
@@ -185,6 +274,15 @@ public class JogoService {
 
         if (jogo.getGolsVisitante().equals(palpite.getGolsVisitantePalpite())) {
             pontos += config.getPontosGolsVisitante();
+        }
+
+        if (jogo.getFase() != FaseCopa.GRUPOS && palpite.getClassificadoPalpite() != null) {
+            Selecao vencedorReal = descobrirVencedorReal(jogo);
+
+            if (vencedorReal != null &&
+                    vencedorReal.getId().equals(palpite.getClassificadoPalpite().getId())) {
+                pontos += config.getPontosClassificado();
+            }
         }
 
         return pontos;
@@ -201,6 +299,36 @@ public class JogoService {
         return resultadoReal == resultadoPalpite;
     }
 
+    private Selecao descobrirVencedorReal(Jogo jogo) {
+        if (jogo.getGolsCasa() > jogo.getGolsVisitante()) {
+            return jogo.getTimeCasa();
+        }
+
+        if (jogo.getGolsVisitante() > jogo.getGolsCasa()) {
+            return jogo.getTimeVisitante();
+        }
+
+        if (jogo.getPenaltisCasa() == null || jogo.getPenaltisVisitante() == null) {
+            return null;
+        }
+
+        return jogo.getPenaltisCasa() > jogo.getPenaltisVisitante()
+                ? jogo.getTimeCasa()
+                : jogo.getTimeVisitante();
+    }
+
+    private FaseCopa converterFase(String fase) {
+        if (fase == null || fase.isBlank()) {
+            return FaseCopa.GRUPOS;
+        }
+
+        try {
+            return FaseCopa.valueOf(fase.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException("Fase inválida: " + fase);
+        }
+    }
+
     private JogoResponseDTO toResponseDTO(Jogo jogo) {
         JogoResponseDTO response = new JogoResponseDTO();
 
@@ -209,10 +337,12 @@ public class JogoService {
         response.setTimeCasaId(jogo.getTimeCasa().getId());
         response.setTimeCasaNome(jogo.getTimeCasa().getNome());
         response.setTimeCasaSigla(jogo.getTimeCasa().getSiglaFifa());
+        response.setTimeCasaBandeiraUrl(jogo.getTimeCasa().getBandeiraUrl());
 
         response.setTimeVisitanteId(jogo.getTimeVisitante().getId());
         response.setTimeVisitanteNome(jogo.getTimeVisitante().getNome());
         response.setTimeVisitanteSigla(jogo.getTimeVisitante().getSiglaFifa());
+        response.setTimeVisitanteBandeiraUrl(jogo.getTimeVisitante().getBandeiraUrl());
 
         response.setEstadioId(jogo.getEstadio().getId());
         response.setEstadioNome(jogo.getEstadio().getNome());
@@ -221,11 +351,39 @@ public class JogoService {
 
         response.setGolsCasa(jogo.getGolsCasa());
         response.setGolsVisitante(jogo.getGolsVisitante());
+        response.setPenaltisCasa(jogo.getPenaltisCasa());
+        response.setPenaltisVisitante(jogo.getPenaltisVisitante());
 
         response.setDataHora(jogo.getDataHora());
-        response.setFase(jogo.getFase());
+        response.setFase(jogo.getFase().name());
+        response.setGrupo(jogo.getGrupo());
         response.setFinalizado(jogo.getFinalizado());
 
         return response;
     }
+    @Transactional
+public String excluirJogo(Long jogoId) {
+    Jogo jogo = jogoRepository.findById(jogoId)
+            .orElseThrow(() -> new ResourceNotFoundException("Jogo não encontrado"));
+
+    List<Palpite> palpites = palpiteRepository.findByJogo(jogo);
+
+    for (Palpite palpite : palpites) {
+        ParticipanteBolao participanteBolao = palpite.getParticipanteBolao();
+
+        Integer pontos = palpite.getPontosObtidos();
+        if (pontos == null) {
+            pontos = 0;
+        }
+
+        participanteBolao.setPontos(participanteBolao.getPontos() - pontos);
+        participanteBolaoRepository.save(participanteBolao);
+
+        palpiteRepository.delete(palpite);
+    }
+
+    jogoRepository.delete(jogo);
+
+    return "Jogo excluído com sucesso.";
+}
 }

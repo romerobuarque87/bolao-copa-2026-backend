@@ -26,5 +26,10 @@ public class PalpiteResponseDTO {
 
     private Integer golsCasaPalpite;
     private Integer golsVisitantePalpite;
+
+    private Long classificadoPalpiteId;
+    private String classificadoPalpiteNome;
+    private String classificadoPalpiteSigla;
+
     private Integer pontosObtidos;
 }

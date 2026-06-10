@@ -23,4 +23,6 @@ public class ConfiguracaoPontuacao {
     private Integer pontosGolsMandante = 2;
 
     private Integer pontosGolsVisitante = 2;
+
+    private Integer pontosClassificado = 5;
 }

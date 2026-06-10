@@ -29,6 +29,9 @@ public class Palpite {
 
     private Integer golsVisitantePalpite;
 
+    @ManyToOne
+    private Selecao classificadoPalpite;
+
     private Integer pontosObtidos = 0;
 
     private Boolean alteracaoLiberadaPeloAdmin = false;

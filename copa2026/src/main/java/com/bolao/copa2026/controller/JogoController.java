@@ -1,10 +1,12 @@
 package com.bolao.copa2026.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,6 +46,24 @@ public class JogoController {
         return ResponseEntity.ok(jogoService.listarTodos());
     }
 
+    @GetMapping("/fase-grupos")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    public ResponseEntity<List<JogoResponseDTO>> listarFaseDeGrupos() {
+        return ResponseEntity.ok(jogoService.listarFaseDeGrupos());
+    }
+
+    @GetMapping("/grupo/{grupo}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    public ResponseEntity<List<JogoResponseDTO>> listarPorGrupo(@PathVariable String grupo) {
+        return ResponseEntity.ok(jogoService.listarPorGrupo(grupo));
+    }
+
+    @GetMapping("/grupos")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    public ResponseEntity<Map<String, List<JogoResponseDTO>>> listarAgrupadosPorGrupo() {
+        return ResponseEntity.ok(jogoService.listarAgrupadosPorGrupo());
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<JogoResponseDTO> buscarPorId(@PathVariable Long id) {
@@ -55,10 +75,17 @@ public class JogoController {
     public ResponseEntity<JogoResponseDTO> finalizarJogo(
             @PathVariable Long id,
             @RequestParam Integer golsCasa,
-            @RequestParam Integer golsVisitante) {
+            @RequestParam Integer golsVisitante,
+            @RequestParam(required = false) Integer penaltisCasa,
+            @RequestParam(required = false) Integer penaltisVisitante) {
 
-        JogoResponseDTO jogoFinalizado =
-                jogoService.finalizarJogo(id, golsCasa, golsVisitante);
+        JogoResponseDTO jogoFinalizado = jogoService.finalizarJogo(
+                id,
+                golsCasa,
+                golsVisitante,
+                penaltisCasa,
+                penaltisVisitante
+        );
 
         return ResponseEntity.ok(jogoFinalizado);
     }
@@ -68,11 +95,25 @@ public class JogoController {
     public ResponseEntity<JogoResponseDTO> corrigirResultado(
             @PathVariable Long id,
             @RequestParam Integer golsCasa,
-            @RequestParam Integer golsVisitante) {
+            @RequestParam Integer golsVisitante,
+            @RequestParam(required = false) Integer penaltisCasa,
+            @RequestParam(required = false) Integer penaltisVisitante) {
 
-        JogoResponseDTO jogoCorrigido =
-                jogoService.corrigirResultado(id, golsCasa, golsVisitante);
+        JogoResponseDTO jogoCorrigido = jogoService.corrigirResultado(
+                id,
+                golsCasa,
+                golsVisitante,
+                penaltisCasa,
+                penaltisVisitante
+        );
 
         return ResponseEntity.ok(jogoCorrigido);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> excluirJogo(@PathVariable Long id) {
+        String resposta = jogoService.excluirJogo(id);
+        return ResponseEntity.ok(resposta);
     }
 }

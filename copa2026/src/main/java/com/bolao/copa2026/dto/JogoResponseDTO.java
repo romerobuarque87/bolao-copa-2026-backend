@@ -14,10 +14,12 @@ public class JogoResponseDTO {
     private Long timeCasaId;
     private String timeCasaNome;
     private String timeCasaSigla;
+    private String timeCasaBandeiraUrl;
 
     private Long timeVisitanteId;
     private String timeVisitanteNome;
     private String timeVisitanteSigla;
+    private String timeVisitanteBandeiraUrl;
 
     private Long estadioId;
     private String estadioNome;
@@ -27,9 +29,14 @@ public class JogoResponseDTO {
     private Integer golsCasa;
     private Integer golsVisitante;
 
+    private Integer penaltisCasa;
+    private Integer penaltisVisitante;
+
     private LocalDateTime dataHora;
 
     private String fase;
+
+    private String grupo;
 
     private Boolean finalizado;
 }
