@@ -35,45 +35,39 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Swagger
                         .requestMatchers(
+                                "/",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html"
                         ).permitAll()
 
-                        // Auth
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/auth/me").authenticated()
 
-                        // Cadastro público
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
 
-                        // Usuário logado
                         .requestMatchers(HttpMethod.PUT, "/usuarios/me").hasAnyRole("ADMIN", "USER")
                         .requestMatchers(HttpMethod.PUT, "/usuarios/me/senha").hasAnyRole("ADMIN", "USER")
 
-                        // Usuários - apenas ADMIN
                         .requestMatchers("/usuarios/**").hasRole("ADMIN")
 
-                        // Administrativo
                         .requestMatchers("/estadios/**").hasRole("ADMIN")
                         .requestMatchers("/selecoes/**").hasRole("ADMIN")
                         .requestMatchers("/configuracao-pontuacao/**").hasRole("ADMIN")
 
-                        // Jogos
                         .requestMatchers(HttpMethod.GET, "/jogos/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers(HttpMethod.POST, "/jogos/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/jogos/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/jogos/**").hasRole("ADMIN")
 
-                        // Sistema do bolão
                         .requestMatchers("/boloes/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/palpites/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/ranking/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/classificacao/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/mata-mata/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )
@@ -88,9 +82,14 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "https://bolao-copa-2026-frontend.vercel.app"
+        ));
+
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("Authorization"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
