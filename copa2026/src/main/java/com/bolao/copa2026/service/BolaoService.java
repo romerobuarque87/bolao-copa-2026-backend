@@ -8,8 +8,10 @@ import com.bolao.copa2026.dto.BolaoRequestDTO;
 import com.bolao.copa2026.dto.BolaoResponseDTO;
 import com.bolao.copa2026.exception.ResourceNotFoundException;
 import com.bolao.copa2026.model.Bolao;
+import com.bolao.copa2026.model.ParticipanteBolao;
 import com.bolao.copa2026.model.Usuario;
 import com.bolao.copa2026.repository.BolaoRepository;
+import com.bolao.copa2026.repository.ParticipanteBolaoRepository;
 import com.bolao.copa2026.repository.UsuarioRepository;
 
 @Service
@@ -17,10 +19,15 @@ public class BolaoService {
 
     private final BolaoRepository bolaoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final ParticipanteBolaoRepository participanteBolaoRepository;
 
-    public BolaoService(BolaoRepository bolaoRepository, UsuarioRepository usuarioRepository) {
+    public BolaoService(
+            BolaoRepository bolaoRepository,
+            UsuarioRepository usuarioRepository,
+            ParticipanteBolaoRepository participanteBolaoRepository) {
         this.bolaoRepository = bolaoRepository;
         this.usuarioRepository = usuarioRepository;
+        this.participanteBolaoRepository = participanteBolaoRepository;
     }
 
     public BolaoResponseDTO criar(BolaoRequestDTO dto) {
@@ -32,6 +39,14 @@ public class BolaoService {
         bolao.setOrganizador(organizador);
 
         Bolao bolaoSalvo = bolaoRepository.save(bolao);
+
+        ParticipanteBolao participante = new ParticipanteBolao();
+        participante.setUsuario(organizador);
+        participante.setBolao(bolaoSalvo);
+        participante.setPontos(0);
+        participante.setPalpitesEnviados(false);
+
+        participanteBolaoRepository.save(participante);
 
         return converterParaResponseDTO(bolaoSalvo);
     }
