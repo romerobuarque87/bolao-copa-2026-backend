@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.bolao.copa2026.dto.AlterarSenhaRequestDTO;
 import com.bolao.copa2026.dto.AtualizarUsuarioLogadoRequestDTO;
+import com.bolao.copa2026.dto.ResetarSenhaUsuarioRequestDTO;
 import com.bolao.copa2026.dto.UsuarioRequestDTO;
 import com.bolao.copa2026.dto.UsuarioResponseDTO;
 import com.bolao.copa2026.exception.BusinessException;
@@ -118,6 +119,24 @@ public class UsuarioService {
 
         return converterParaResponseDTO(usuarioSalvo);
     }
+    public String resetarSenhaPorAdmin(Long id, ResetarSenhaUsuarioRequestDTO dto) {
+    Usuario usuario = usuarioRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+    if (dto.getNovaSenha() == null || dto.getNovaSenha().isBlank()) {
+        throw new BusinessException("Informe a nova senha");
+    }
+
+    if (dto.getNovaSenha().length() < 6) {
+        throw new BusinessException("A nova senha deve ter pelo menos 6 caracteres");
+    }
+
+    usuario.setSenha(passwordEncoder.encode(dto.getNovaSenha()));
+
+    usuarioRepository.save(usuario);
+
+    return "Senha redefinida com sucesso";
+}
 
     public List<UsuarioResponseDTO> listar() {
         return usuarioRepository.findAll()

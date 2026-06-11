@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bolao.copa2026.dto.AlterarSenhaRequestDTO;
 import com.bolao.copa2026.dto.AtualizarUsuarioLogadoRequestDTO;
+import com.bolao.copa2026.dto.ResetarSenhaUsuarioRequestDTO;
 import com.bolao.copa2026.dto.UsuarioRequestDTO;
 import com.bolao.copa2026.dto.UsuarioResponseDTO;
 import com.bolao.copa2026.service.UsuarioService;
@@ -54,6 +55,14 @@ public class UsuarioController {
 
         return usuarioService.alterarSenha(authentication, dto);
     }
+    @PutMapping("/{id}/resetar-senha")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String resetarSenhaPorAdmin(
+        @PathVariable Long id,
+        @RequestBody ResetarSenhaUsuarioRequestDTO dto) {
+
+        return usuarioService.resetarSenhaPorAdmin(id, dto);
+}
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
