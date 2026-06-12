@@ -13,7 +13,9 @@ public interface PalpiteRepository extends JpaRepository<Palpite, Long> {
 
     List<Palpite> findByJogo(Jogo jogo);
 
-    List<Palpite> findByParticipanteBolao(ParticipanteBolao participanteBolao);
+    List<Palpite> findByParticipanteBolao(
+            ParticipanteBolao participanteBolao
+    );
 
     Optional<Palpite> findByParticipanteBolaoAndJogo(
             ParticipanteBolao participanteBolao,
@@ -27,5 +29,9 @@ public interface PalpiteRepository extends JpaRepository<Palpite, Long> {
 
     long countByParticipanteBolaoAndJogo_FinalizadoFalse(
             ParticipanteBolao participanteBolao
+    );
+
+    List<Palpite> findByParticipanteBolao_Bolao_IdAndParticipanteBolao_PalpitesEnviadosTrueOrderByParticipanteBolao_Usuario_NomeAscJogo_DataHoraAsc(
+            Long bolaoId
     );
 }

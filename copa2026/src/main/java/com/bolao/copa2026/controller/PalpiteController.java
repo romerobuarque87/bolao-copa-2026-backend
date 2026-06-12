@@ -73,4 +73,15 @@ public class PalpiteController {
 
         return ResponseEntity.ok(palpiteService.listarPorParticipante(participanteBolaoId));
     }
+
+    @GetMapping("/bolao/{bolaoId}/participante/{participanteBolaoId}/enviados")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    public ResponseEntity<List<PalpiteResponseDTO>> listarPalpitesEnviadosPorBolao(
+            @PathVariable Long bolaoId,
+            @PathVariable Long participanteBolaoId) {
+
+        return ResponseEntity.ok(
+                palpiteService.listarPalpitesEnviadosPorBolao(bolaoId, participanteBolaoId)
+        );
+    }
 }

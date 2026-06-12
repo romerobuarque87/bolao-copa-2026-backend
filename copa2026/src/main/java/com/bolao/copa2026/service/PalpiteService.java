@@ -71,10 +71,7 @@ public class PalpiteService {
             throw new BusinessException("Não é possível palpitar em jogo já finalizado");
         }
 
-        boolean jaExistePalpite = palpiteRepository.existsByParticipanteBolaoAndJogo(
-                participanteBolao,
-                jogo
-        );
+        boolean jaExistePalpite = palpiteRepository.existsByParticipanteBolaoAndJogo(participanteBolao, jogo);
 
         if (jaExistePalpite) {
             throw new BusinessException("Este participante já fez palpite para este jogo");
@@ -91,9 +88,7 @@ public class PalpiteService {
         palpite.setPontosObtidos(0);
         palpite.setAlteracaoLiberadaPeloAdmin(false);
 
-        Palpite palpiteSalvo = palpiteRepository.save(palpite);
-
-        return toResponseDTO(palpiteSalvo);
+        return toResponseDTO(palpiteRepository.save(palpite));
     }
 
     public PalpiteResponseDTO alterarPalpite(Long palpiteId, PalpiteAlteracaoRequestDTO request) {
@@ -102,11 +97,8 @@ public class PalpiteService {
 
         ParticipanteBolao participanteBolao = palpite.getParticipanteBolao();
 
-        boolean participanteAindaNaoEnviou =
-                !Boolean.TRUE.equals(participanteBolao.getPalpitesEnviados());
-
-        boolean palpiteLiberadoPeloAdmin =
-                Boolean.TRUE.equals(palpite.getAlteracaoLiberadaPeloAdmin());
+        boolean participanteAindaNaoEnviou = !Boolean.TRUE.equals(participanteBolao.getPalpitesEnviados());
+        boolean palpiteLiberadoPeloAdmin = Boolean.TRUE.equals(palpite.getAlteracaoLiberadaPeloAdmin());
 
         if (!participanteAindaNaoEnviou && !palpiteLiberadoPeloAdmin) {
             throw new BusinessException("Este palpite está bloqueado. Solicite liberação ao administrador");
@@ -119,7 +111,6 @@ public class PalpiteService {
         palpite.setGolsCasaPalpite(request.getGolsCasaPalpite());
         palpite.setGolsVisitantePalpite(request.getGolsVisitantePalpite());
         palpite.setPontosObtidos(0);
-
         palpite.setAlteracaoLiberadaPeloAdmin(false);
 
         Palpite palpiteSalvo = palpiteRepository.save(palpite);
@@ -213,6 +204,28 @@ public class PalpiteService {
                 .orElseThrow(() -> new ResourceNotFoundException("Participante do bolão não encontrado"));
 
         return palpiteRepository.findByParticipanteBolao(participanteBolao)
+                .stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
+    public List<PalpiteResponseDTO> listarPalpitesEnviadosPorBolao(Long bolaoId, Long participanteBolaoId) {
+        ParticipanteBolao participanteBolao = participanteBolaoRepository
+                .findById(participanteBolaoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Participante do bolão não encontrado"));
+
+        if (!participanteBolao.getBolao().getId().equals(bolaoId)) {
+            throw new BusinessException("Este participante não pertence ao bolão informado");
+        }
+
+        boolean ehAdmin = Boolean.TRUE.equals(participanteBolao.getUsuario().getAdministrador());
+
+        if (!ehAdmin && !Boolean.TRUE.equals(participanteBolao.getPalpitesEnviados())) {
+            throw new BusinessException("Você só pode ver os palpites dos outros participantes depois de enviar os seus.");
+        }
+
+        return palpiteRepository
+                .findByParticipanteBolao_Bolao_IdAndParticipanteBolao_PalpitesEnviadosTrueOrderByParticipanteBolao_Usuario_NomeAscJogo_DataHoraAsc(bolaoId)
                 .stream()
                 .map(this::toResponseDTO)
                 .toList();
