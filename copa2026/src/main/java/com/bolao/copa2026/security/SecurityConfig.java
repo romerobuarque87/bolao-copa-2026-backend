@@ -84,7 +84,8 @@ public class SecurityConfig {
 
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "https://bolao-copa-2026-frontend.vercel.app"
+                "https://bolao-copa-2026-frontend.vercel.app",
+                "https://bolao-copa-2026-frontend-i0p3hdati-bolao2026-s-projects.vercel.app"
         ));
 
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
