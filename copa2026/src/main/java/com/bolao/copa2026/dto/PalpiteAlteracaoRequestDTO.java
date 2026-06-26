@@ -9,4 +9,5 @@ public class PalpiteAlteracaoRequestDTO {
 
     private Integer golsCasaPalpite;
     private Integer golsVisitantePalpite;
+    private Long classificadoPalpiteId;
 }

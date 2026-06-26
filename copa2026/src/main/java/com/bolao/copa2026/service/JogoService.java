@@ -248,22 +248,17 @@ public class JogoService {
     }
 
     private int calcularPontos(Jogo jogo, Palpite palpite) {
-        ConfiguracaoPontuacao config = configuracaoPontuacaoService.buscarConfiguracao();
+    ConfiguracaoPontuacao config = configuracaoPontuacaoService.buscarConfiguracao();
 
-        boolean placarExato =
-                jogo.getGolsCasa().equals(palpite.getGolsCasaPalpite()) &&
-                jogo.getGolsVisitante().equals(palpite.getGolsVisitantePalpite());
+    boolean placarExato =
+            jogo.getGolsCasa().equals(palpite.getGolsCasaPalpite()) &&
+            jogo.getGolsVisitante().equals(palpite.getGolsVisitantePalpite());
 
-        if (placarExato && jogo.getFase() == FaseCopa.GRUPOS) {
-            return config.getPontosPlacarExato();
-        }
+    int pontos = 0;
 
-        int pontos = 0;
-
-        if (placarExato) {
-            pontos += config.getPontosPlacarExato();
-        }
-
+    if (placarExato) {
+        pontos += config.getPontosPlacarExato();
+    } else {
         if (acertouResultado(jogo, palpite)) {
             pontos += config.getPontosResultado();
         }
@@ -275,18 +270,19 @@ public class JogoService {
         if (jogo.getGolsVisitante().equals(palpite.getGolsVisitantePalpite())) {
             pontos += config.getPontosGolsVisitante();
         }
-
-        if (jogo.getFase() != FaseCopa.GRUPOS && palpite.getClassificadoPalpite() != null) {
-            Selecao vencedorReal = descobrirVencedorReal(jogo);
-
-            if (vencedorReal != null &&
-                    vencedorReal.getId().equals(palpite.getClassificadoPalpite().getId())) {
-                pontos += config.getPontosClassificado();
-            }
-        }
-
-        return pontos;
     }
+
+    if (jogo.getFase() != FaseCopa.GRUPOS && palpite.getClassificadoPalpite() != null) {
+        Selecao vencedorReal = descobrirVencedorReal(jogo);
+
+        if (vencedorReal != null &&
+                vencedorReal.getId().equals(palpite.getClassificadoPalpite().getId())) {
+            pontos += config.getPontosClassificado();
+        }
+    }
+
+    return pontos;
+}
 
     private boolean acertouResultado(Jogo jogo, Palpite palpite) {
         int resultadoReal = Integer.compare(jogo.getGolsCasa(), jogo.getGolsVisitante());
