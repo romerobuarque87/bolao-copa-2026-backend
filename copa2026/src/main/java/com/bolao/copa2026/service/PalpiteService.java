@@ -1,6 +1,7 @@
 package com.bolao.copa2026.service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -26,6 +27,8 @@ import com.bolao.copa2026.repository.UsuarioRepository;
 
 @Service
 public class PalpiteService {
+
+    private static final ZoneId FUSO_BRASILIA = ZoneId.of("America/Sao_Paulo");
 
     private static final LocalDateTime DATA_LIMITE_PALPITES_GRUPOS =
             LocalDateTime.of(2026, 6, 11, 23, 59, 59);
@@ -77,7 +80,12 @@ public class PalpiteService {
             throw new BusinessException("Este participante ja fez palpite para este jogo");
         }
 
-        Selecao classificadoPalpite = buscarClassificadoPalpiteSeNecessario(jogo, request.getClassificadoPalpiteId());
+        Selecao classificadoPalpite = buscarClassificadoPalpiteSeNecessario(
+                jogo,
+                request.getGolsCasaPalpite(),
+                request.getGolsVisitantePalpite(),
+                request.getClassificadoPalpiteId()
+        );
 
         Palpite palpite = new Palpite();
         palpite.setParticipanteBolao(participanteBolao);
@@ -111,7 +119,12 @@ public class PalpiteService {
             throw new BusinessException("Nao e possivel alterar palpite de jogo ja finalizado");
         }
 
-        Selecao classificadoPalpite = buscarClassificadoPalpiteSeNecessario(jogo, request.getClassificadoPalpiteId());
+        Selecao classificadoPalpite = buscarClassificadoPalpiteSeNecessario(
+                jogo,
+                request.getGolsCasaPalpite(),
+                request.getGolsVisitantePalpite(),
+                request.getClassificadoPalpiteId()
+        );
 
         palpite.setGolsCasaPalpite(request.getGolsCasaPalpite());
         palpite.setGolsVisitantePalpite(request.getGolsVisitantePalpite());
@@ -237,13 +250,32 @@ public class PalpiteService {
                 .toList();
     }
 
-    private Selecao buscarClassificadoPalpiteSeNecessario(Jogo jogo, Long classificadoPalpiteId) {
+    private Selecao buscarClassificadoPalpiteSeNecessario(
+            Jogo jogo,
+            Integer golsCasaPalpite,
+            Integer golsVisitantePalpite,
+            Long classificadoPalpiteId
+    ) {
         if (jogo.getFase() == FaseCopa.GRUPOS) {
             return null;
         }
 
+        if (golsCasaPalpite == null || golsVisitantePalpite == null) {
+            throw new BusinessException("Informe os dois placares do palpite");
+        }
+
+        if (golsCasaPalpite > golsVisitantePalpite) {
+            validarClassificadoCoerenteSeInformado(jogo, classificadoPalpiteId, jogo.getTimeCasa());
+            return jogo.getTimeCasa();
+        }
+
+        if (golsVisitantePalpite > golsCasaPalpite) {
+            validarClassificadoCoerenteSeInformado(jogo, classificadoPalpiteId, jogo.getTimeVisitante());
+            return jogo.getTimeVisitante();
+        }
+
         if (classificadoPalpiteId == null) {
-            throw new BusinessException("Em jogos de mata-mata, informe quem voce acha que vai se classificar");
+            throw new BusinessException("Em jogos de mata-mata empatados, informe quem voce acha que vai se classificar");
         }
 
         Selecao classificado = selecaoRepository.findById(classificadoPalpiteId)
@@ -258,6 +290,24 @@ public class PalpiteService {
         }
 
         return classificado;
+    }
+
+    private void validarClassificadoCoerenteSeInformado(Jogo jogo, Long classificadoPalpiteId, Selecao classificadoEsperado) {
+        if (classificadoPalpiteId == null) {
+            return;
+        }
+
+        boolean ehTimeDoJogo =
+                classificadoPalpiteId.equals(jogo.getTimeCasa().getId()) ||
+                classificadoPalpiteId.equals(jogo.getTimeVisitante().getId());
+
+        if (!ehTimeDoJogo) {
+            throw new BusinessException("O classificado informado precisa ser um dos times do jogo");
+        }
+
+        if (!classificadoPalpiteId.equals(classificadoEsperado.getId())) {
+            throw new BusinessException("O classificado precisa ser coerente com o placar do palpite");
+        }
     }
 
     private Selecao descobrirVencedorReal(Jogo jogo) {
@@ -283,17 +333,22 @@ public class PalpiteService {
     }
 
     public int calcularPontosDoPalpite(Jogo jogo, Palpite palpite) {
-    ConfiguracaoPontuacao config = configuracaoPontuacaoService.buscarConfiguracao();
+        ConfiguracaoPontuacao config = configuracaoPontuacaoService.buscarConfiguracao();
 
-    boolean placarExato =
-            jogo.getGolsCasa().equals(palpite.getGolsCasaPalpite()) &&
-            jogo.getGolsVisitante().equals(palpite.getGolsVisitantePalpite());
+        boolean placarExato =
+                jogo.getGolsCasa().equals(palpite.getGolsCasaPalpite()) &&
+                jogo.getGolsVisitante().equals(palpite.getGolsVisitantePalpite());
 
-    int pontos = 0;
+        if (placarExato && jogo.getFase() == FaseCopa.GRUPOS) {
+            return config.getPontosPlacarExato();
+        }
 
-    if (placarExato) {
-        pontos += config.getPontosPlacarExato();
-    } else {
+        int pontos = 0;
+
+        if (placarExato) {
+            pontos += config.getPontosPlacarExato();
+        }
+
         int resultadoReal = Integer.compare(jogo.getGolsCasa(), jogo.getGolsVisitante());
 
         int resultadoPalpite = Integer.compare(
@@ -312,22 +367,21 @@ public class PalpiteService {
         if (jogo.getGolsVisitante().equals(palpite.getGolsVisitantePalpite())) {
             pontos += config.getPontosGolsVisitante();
         }
-    }
 
-    if (jogo.getFase() != FaseCopa.GRUPOS && palpite.getClassificadoPalpite() != null) {
-        Selecao vencedorReal = descobrirVencedorReal(jogo);
+        if (jogo.getFase() != FaseCopa.GRUPOS && palpite.getClassificadoPalpite() != null) {
+            Selecao vencedorReal = descobrirVencedorReal(jogo);
 
-        if (vencedorReal != null &&
-                vencedorReal.getId().equals(palpite.getClassificadoPalpite().getId())) {
-            pontos += config.getPontosClassificado();
+            if (vencedorReal != null &&
+                    vencedorReal.getId().equals(palpite.getClassificadoPalpite().getId())) {
+                pontos += config.getPontosClassificado();
+            }
         }
-    }
 
-    return pontos;
-}
+        return pontos;
+    }
 
     private void validarDataLimiteGrupos() {
-        if (LocalDateTime.now().isAfter(DATA_LIMITE_PALPITES_GRUPOS)) {
+        if (agoraEmBrasilia().isAfter(DATA_LIMITE_PALPITES_GRUPOS)) {
             throw new BusinessException("O prazo para enviar palpites da fase de grupos ja foi encerrado");
         }
     }
@@ -337,9 +391,13 @@ public class PalpiteService {
                 ? DATA_LIMITE_PALPITES_GRUPOS
                 : jogo.getDataHora();
 
-        if (dataLimite != null && LocalDateTime.now().isAfter(dataLimite)) {
+        if (dataLimite != null && !agoraEmBrasilia().isBefore(dataLimite)) {
             throw new BusinessException("O prazo para palpitar neste jogo ja foi encerrado");
         }
+    }
+
+    private LocalDateTime agoraEmBrasilia() {
+        return LocalDateTime.now(FUSO_BRASILIA);
     }
 
     private PalpiteResponseDTO toResponseDTO(Palpite palpite) {

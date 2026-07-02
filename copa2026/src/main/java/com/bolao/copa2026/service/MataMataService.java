@@ -42,7 +42,7 @@ public class MataMataService {
     @Transactional
     public String gerarDezesseisAvos() {
         if (jogoRepository.countByFase(FaseCopa.DEZESSEIS_AVOS) > 0) {
-            throw new BusinessException("Os jogos dos dezesseis-avos já foram gerados.");
+            throw new BusinessException("Os jogos dos dezesseis-avos ja foram gerados.");
         }
 
         validarGruposFinalizados();
@@ -74,25 +74,25 @@ public class MataMataService {
 
         List<ClassificacaoGrupoDTO> melhoresTerceiros = terceiros.subList(0, 8);
 
-        criarJogoMataMata(buscarSelecao(primeiros.get(0)), buscarSelecao(melhoresTerceiros.get(7)), FaseCopa.DEZESSEIS_AVOS, "MetLife Stadium", 2026, 6, 28, 18, 0);
-        criarJogoMataMata(buscarSelecao(primeiros.get(1)), buscarSelecao(melhoresTerceiros.get(6)), FaseCopa.DEZESSEIS_AVOS, "SoFi Stadium", 2026, 6, 28, 21, 0);
-        criarJogoMataMata(buscarSelecao(primeiros.get(2)), buscarSelecao(melhoresTerceiros.get(5)), FaseCopa.DEZESSEIS_AVOS, "AT&T Stadium", 2026, 6, 29, 18, 0);
-        criarJogoMataMata(buscarSelecao(primeiros.get(3)), buscarSelecao(melhoresTerceiros.get(4)), FaseCopa.DEZESSEIS_AVOS, "Mercedes-Benz Stadium", 2026, 6, 29, 21, 0);
+        criarJogoMataMata(buscarSelecao(primeiros.get(0)), buscarSelecao(melhoresTerceiros.get(7)), FaseCopa.DEZESSEIS_AVOS, "MetLife Stadium", 2026, 6, 28, 18, 0, 1);
+        criarJogoMataMata(buscarSelecao(primeiros.get(1)), buscarSelecao(melhoresTerceiros.get(6)), FaseCopa.DEZESSEIS_AVOS, "SoFi Stadium", 2026, 6, 28, 21, 0, 2);
+        criarJogoMataMata(buscarSelecao(primeiros.get(2)), buscarSelecao(melhoresTerceiros.get(5)), FaseCopa.DEZESSEIS_AVOS, "AT&T Stadium", 2026, 6, 29, 18, 0, 3);
+        criarJogoMataMata(buscarSelecao(primeiros.get(3)), buscarSelecao(melhoresTerceiros.get(4)), FaseCopa.DEZESSEIS_AVOS, "Mercedes-Benz Stadium", 2026, 6, 29, 21, 0, 4);
 
-        criarJogoMataMata(buscarSelecao(primeiros.get(4)), buscarSelecao(melhoresTerceiros.get(3)), FaseCopa.DEZESSEIS_AVOS, "Hard Rock Stadium", 2026, 6, 30, 18, 0);
-        criarJogoMataMata(buscarSelecao(primeiros.get(5)), buscarSelecao(melhoresTerceiros.get(2)), FaseCopa.DEZESSEIS_AVOS, "BC Place", 2026, 6, 30, 21, 0);
-        criarJogoMataMata(buscarSelecao(primeiros.get(6)), buscarSelecao(melhoresTerceiros.get(1)), FaseCopa.DEZESSEIS_AVOS, "BMO Field", 2026, 7, 1, 18, 0);
-        criarJogoMataMata(buscarSelecao(primeiros.get(7)), buscarSelecao(melhoresTerceiros.get(0)), FaseCopa.DEZESSEIS_AVOS, "Estádio Azteca", 2026, 7, 1, 21, 0);
+        criarJogoMataMata(buscarSelecao(primeiros.get(4)), buscarSelecao(melhoresTerceiros.get(3)), FaseCopa.DEZESSEIS_AVOS, "Hard Rock Stadium", 2026, 6, 30, 18, 0, 5);
+        criarJogoMataMata(buscarSelecao(primeiros.get(5)), buscarSelecao(melhoresTerceiros.get(2)), FaseCopa.DEZESSEIS_AVOS, "BC Place", 2026, 6, 30, 21, 0, 6);
+        criarJogoMataMata(buscarSelecao(primeiros.get(6)), buscarSelecao(melhoresTerceiros.get(1)), FaseCopa.DEZESSEIS_AVOS, "BMO Field", 2026, 7, 1, 18, 0, 7);
+        criarJogoMataMata(buscarSelecao(primeiros.get(7)), buscarSelecao(melhoresTerceiros.get(0)), FaseCopa.DEZESSEIS_AVOS, "Estadio Azteca", 2026, 7, 1, 21, 0, 8);
 
-        criarJogoMataMata(buscarSelecao(primeiros.get(8)), buscarSelecao(segundos.get(9)), FaseCopa.DEZESSEIS_AVOS, "MetLife Stadium", 2026, 7, 2, 18, 0);
-        criarJogoMataMata(buscarSelecao(primeiros.get(9)), buscarSelecao(segundos.get(8)), FaseCopa.DEZESSEIS_AVOS, "SoFi Stadium", 2026, 7, 2, 21, 0);
-        criarJogoMataMata(buscarSelecao(primeiros.get(10)), buscarSelecao(segundos.get(11)), FaseCopa.DEZESSEIS_AVOS, "AT&T Stadium", 2026, 7, 3, 18, 0);
-        criarJogoMataMata(buscarSelecao(primeiros.get(11)), buscarSelecao(segundos.get(10)), FaseCopa.DEZESSEIS_AVOS, "Mercedes-Benz Stadium", 2026, 7, 3, 21, 0);
+        criarJogoMataMata(buscarSelecao(primeiros.get(8)), buscarSelecao(segundos.get(9)), FaseCopa.DEZESSEIS_AVOS, "MetLife Stadium", 2026, 7, 2, 18, 0, 9);
+        criarJogoMataMata(buscarSelecao(primeiros.get(9)), buscarSelecao(segundos.get(8)), FaseCopa.DEZESSEIS_AVOS, "SoFi Stadium", 2026, 7, 2, 21, 0, 10);
+        criarJogoMataMata(buscarSelecao(primeiros.get(10)), buscarSelecao(segundos.get(11)), FaseCopa.DEZESSEIS_AVOS, "AT&T Stadium", 2026, 7, 3, 18, 0, 11);
+        criarJogoMataMata(buscarSelecao(primeiros.get(11)), buscarSelecao(segundos.get(10)), FaseCopa.DEZESSEIS_AVOS, "Mercedes-Benz Stadium", 2026, 7, 3, 21, 0, 12);
 
-        criarJogoMataMata(buscarSelecao(segundos.get(0)), buscarSelecao(segundos.get(1)), FaseCopa.DEZESSEIS_AVOS, "Hard Rock Stadium", 2026, 7, 4, 18, 0);
-        criarJogoMataMata(buscarSelecao(segundos.get(2)), buscarSelecao(segundos.get(3)), FaseCopa.DEZESSEIS_AVOS, "BC Place", 2026, 7, 4, 21, 0);
-        criarJogoMataMata(buscarSelecao(segundos.get(4)), buscarSelecao(segundos.get(5)), FaseCopa.DEZESSEIS_AVOS, "BMO Field", 2026, 7, 5, 18, 0);
-        criarJogoMataMata(buscarSelecao(segundos.get(6)), buscarSelecao(segundos.get(7)), FaseCopa.DEZESSEIS_AVOS, "Estádio Azteca", 2026, 7, 5, 21, 0);
+        criarJogoMataMata(buscarSelecao(segundos.get(0)), buscarSelecao(segundos.get(1)), FaseCopa.DEZESSEIS_AVOS, "Hard Rock Stadium", 2026, 7, 4, 18, 0, 13);
+        criarJogoMataMata(buscarSelecao(segundos.get(2)), buscarSelecao(segundos.get(3)), FaseCopa.DEZESSEIS_AVOS, "BC Place", 2026, 7, 4, 21, 0, 14);
+        criarJogoMataMata(buscarSelecao(segundos.get(4)), buscarSelecao(segundos.get(5)), FaseCopa.DEZESSEIS_AVOS, "BMO Field", 2026, 7, 5, 18, 0, 15);
+        criarJogoMataMata(buscarSelecao(segundos.get(6)), buscarSelecao(segundos.get(7)), FaseCopa.DEZESSEIS_AVOS, "Estadio Azteca", 2026, 7, 5, 21, 0, 16);
 
         return "Dezesseis-avos gerados com sucesso.";
     }
@@ -104,9 +104,16 @@ public class MataMataService {
                 FaseCopa.OITAVAS,
                 16,
                 "Oitavas geradas com sucesso.",
-                2026,
-                7,
-                6
+                List.of(
+                        new JogoMataMataConfig("Estadio a definir", 2026, 7, 4, 14, 0),
+                        new JogoMataMataConfig("Estadio a definir", 2026, 7, 4, 18, 0),
+                        new JogoMataMataConfig("Estadio a definir", 2026, 7, 6, 21, 0),
+                        new JogoMataMataConfig("Estadio a definir", 2026, 7, 6, 16, 0),
+                        new JogoMataMataConfig("Estadio a definir", 2026, 7, 5, 17, 0),
+                        new JogoMataMataConfig("Estadio a definir", 2026, 7, 5, 21, 0),
+                        new JogoMataMataConfig("Estadio a definir", 2026, 7, 7, 17, 0),
+                        new JogoMataMataConfig("Estadio a definir", 2026, 7, 7, 13, 0)
+                )
         );
     }
 
@@ -117,9 +124,12 @@ public class MataMataService {
                 FaseCopa.QUARTAS,
                 8,
                 "Quartas geradas com sucesso.",
-                2026,
-                7,
-                10
+                List.of(
+                        new JogoMataMataConfig("Estadio a definir", 2026, 7, 9, 17, 0),
+                        new JogoMataMataConfig("Estadio a definir", 2026, 7, 10, 16, 0),
+                        new JogoMataMataConfig("Estadio a definir", 2026, 7, 11, 18, 0),
+                        new JogoMataMataConfig("Estadio a definir", 2026, 7, 11, 22, 0)
+                )
         );
     }
 
@@ -130,39 +140,39 @@ public class MataMataService {
                 FaseCopa.SEMIFINAL,
                 4,
                 "Semifinais geradas com sucesso.",
-                2026,
-                7,
-                14
+                List.of(
+                        new JogoMataMataConfig("Estadio a definir", 2026, 7, 14, 16, 0),
+                        new JogoMataMataConfig("Estadio a definir", 2026, 7, 15, 16, 0)
+                )
         );
     }
 
     @Transactional
     public String gerarFinal() {
         if (jogoRepository.countByFase(FaseCopa.FINAL) > 0) {
-            throw new BusinessException("A final já foi gerada.");
+            throw new BusinessException("A final ja foi gerada.");
         }
 
-        List<Jogo> semifinais = jogoRepository.findByFaseOrderByDataHoraAsc(FaseCopa.SEMIFINAL);
+        List<Jogo> semifinais = jogosOrdenadosPorChave(FaseCopa.SEMIFINAL);
 
         if (semifinais.size() != 2) {
-            throw new BusinessException("É necessário ter exatamente 2 semifinais para gerar a final.");
+            throw new BusinessException("E necessario ter exatamente 2 semifinais para gerar a final.");
         }
 
+        validarOrdemMataMata(semifinais, FaseCopa.SEMIFINAL);
         validarJogosFinalizados(semifinais, FaseCopa.SEMIFINAL);
 
-        Selecao vencedorSemi1 = obterVencedor(semifinais.get(0));
-        Selecao vencedorSemi2 = obterVencedor(semifinais.get(1));
-
         criarJogoMataMata(
-                vencedorSemi1,
-                vencedorSemi2,
+                obterVencedor(semifinais.get(0)),
+                obterVencedor(semifinais.get(1)),
                 FaseCopa.FINAL,
-                "MetLife Stadium",
+                "Estadio a definir",
                 2026,
                 7,
                 19,
                 16,
-                0
+                0,
+                1
         );
 
         return "Final gerada com sucesso.";
@@ -171,30 +181,29 @@ public class MataMataService {
     @Transactional
     public String gerarTerceiroLugar() {
         if (jogoRepository.countByFase(FaseCopa.TERCEIRO_LUGAR) > 0) {
-            throw new BusinessException("A disputa de terceiro lugar já foi gerada.");
+            throw new BusinessException("A disputa de terceiro lugar ja foi gerada.");
         }
 
-        List<Jogo> semifinais = jogoRepository.findByFaseOrderByDataHoraAsc(FaseCopa.SEMIFINAL);
+        List<Jogo> semifinais = jogosOrdenadosPorChave(FaseCopa.SEMIFINAL);
 
         if (semifinais.size() != 2) {
-            throw new BusinessException("É necessário ter exatamente 2 semifinais para gerar o terceiro lugar.");
+            throw new BusinessException("E necessario ter exatamente 2 semifinais para gerar o terceiro lugar.");
         }
 
+        validarOrdemMataMata(semifinais, FaseCopa.SEMIFINAL);
         validarJogosFinalizados(semifinais, FaseCopa.SEMIFINAL);
 
-        Selecao perdedorSemi1 = obterPerdedor(semifinais.get(0));
-        Selecao perdedorSemi2 = obterPerdedor(semifinais.get(1));
-
         criarJogoMataMata(
-                perdedorSemi1,
-                perdedorSemi2,
+                obterPerdedor(semifinais.get(0)),
+                obterPerdedor(semifinais.get(1)),
                 FaseCopa.TERCEIRO_LUGAR,
-                "Hard Rock Stadium",
+                "Estadio a definir",
                 2026,
                 7,
                 18,
                 16,
-                0
+                0,
+                1
         );
 
         return "Disputa de terceiro lugar gerada com sucesso.";
@@ -205,53 +214,67 @@ public class MataMataService {
             FaseCopa faseNova,
             int quantidadeEsperadaFaseAnterior,
             String mensagemSucesso,
-            int ano,
-            int mes,
-            int diaInicial
+            List<JogoMataMataConfig> configuracoes
     ) {
         if (jogoRepository.countByFase(faseNova) > 0) {
-            throw new BusinessException("A fase " + faseNova + " já foi gerada.");
+            throw new BusinessException("A fase " + faseNova + " ja foi gerada.");
         }
 
-        List<Jogo> jogosAnteriores = jogoRepository.findByFaseOrderByDataHoraAsc(faseAnterior);
+        List<Jogo> jogosAnteriores = jogosOrdenadosPorChave(faseAnterior);
 
         if (jogosAnteriores.size() != quantidadeEsperadaFaseAnterior) {
             throw new BusinessException(
-                    "Quantidade inválida de jogos em " + faseAnterior +
+                    "Quantidade invalida de jogos em " + faseAnterior +
                             ". Esperado: " + quantidadeEsperadaFaseAnterior +
                             ". Encontrado: " + jogosAnteriores.size()
             );
         }
 
+        if (configuracoes.size() != quantidadeEsperadaFaseAnterior / 2) {
+            throw new BusinessException("Configuracao invalida para gerar " + faseNova + ".");
+        }
+
+        validarOrdemMataMata(jogosAnteriores, faseAnterior);
         validarJogosFinalizados(jogosAnteriores, faseAnterior);
 
-        int dia = diaInicial;
-        int hora = 18;
-
         for (int i = 0; i < jogosAnteriores.size(); i += 2) {
-            Selecao vencedor1 = obterVencedor(jogosAnteriores.get(i));
-            Selecao vencedor2 = obterVencedor(jogosAnteriores.get(i + 1));
+            int ordemNovaFase = (i / 2) + 1;
+            JogoMataMataConfig config = configuracoes.get(i / 2);
 
             criarJogoMataMata(
-                    vencedor1,
-                    vencedor2,
+                    obterVencedor(jogosAnteriores.get(i)),
+                    obterVencedor(jogosAnteriores.get(i + 1)),
                     faseNova,
-                    escolherEstadio(i),
-                    ano,
-                    mes,
-                    dia,
-                    hora,
-                    0
+                    config.nomeEstadio(),
+                    config.ano(),
+                    config.mes(),
+                    config.dia(),
+                    config.hora(),
+                    config.minuto(),
+                    ordemNovaFase
             );
-
-            hora = hora == 18 ? 21 : 18;
-
-            if (hora == 18) {
-                dia++;
-            }
         }
 
         return mensagemSucesso;
+    }
+
+    private List<Jogo> jogosOrdenadosPorChave(FaseCopa fase) {
+        List<Jogo> jogos = jogoRepository.findByFaseOrderByOrdemMataMataAsc(fase);
+        jogos.sort(Comparator.comparing(Jogo::getOrdemMataMata, Comparator.nullsLast(Integer::compareTo)));
+        return jogos;
+    }
+
+    private void validarOrdemMataMata(List<Jogo> jogos, FaseCopa fase) {
+        for (int i = 0; i < jogos.size(); i++) {
+            Integer ordemEsperada = i + 1;
+            Integer ordemAtual = jogos.get(i).getOrdemMataMata();
+
+            if (!ordemEsperada.equals(ordemAtual)) {
+                throw new BusinessException(
+                        "A fase " + fase + " precisa ter ordem_mata_mata preenchida de 1 ate " + jogos.size() + "."
+                );
+            }
+        }
     }
 
     private void validarGruposFinalizados() {
@@ -267,7 +290,7 @@ public class MataMataService {
             );
 
             if (jogos.size() < 6) {
-                throw new BusinessException("O grupo " + grupo + " ainda não possui 6 jogos.");
+                throw new BusinessException("O grupo " + grupo + " ainda nao possui 6 jogos.");
             }
 
             boolean existePendente = jogos.stream()
@@ -290,12 +313,12 @@ public class MataMataService {
 
     private Selecao buscarSelecao(ClassificacaoGrupoDTO dto) {
         return selecaoRepository.findById(dto.getSelecaoId())
-                .orElseThrow(() -> new BusinessException("Seleção não encontrada"));
+                .orElseThrow(() -> new BusinessException("Selecao nao encontrada"));
     }
 
     private Selecao obterVencedor(Jogo jogo) {
         if (!Boolean.TRUE.equals(jogo.getFinalizado())) {
-            throw new BusinessException("Existe jogo não finalizado na fase " + jogo.getFase());
+            throw new BusinessException("Existe jogo nao finalizado na fase " + jogo.getFase());
         }
 
         if (jogo.getGolsCasa() > jogo.getGolsVisitante()) {
@@ -307,7 +330,7 @@ public class MataMataService {
         }
 
         if (jogo.getPenaltisCasa() == null || jogo.getPenaltisVisitante() == null) {
-            throw new BusinessException("Jogo empatado sem resultado dos pênaltis.");
+            throw new BusinessException("Jogo empatado sem resultado dos penaltis.");
         }
 
         if (jogo.getPenaltisCasa() > jogo.getPenaltisVisitante()) {
@@ -327,19 +350,15 @@ public class MataMataService {
         return jogo.getTimeCasa();
     }
 
-    private String escolherEstadio(int indice) {
-        String[] estadios = {
-                "MetLife Stadium",
-                "SoFi Stadium",
-                "AT&T Stadium",
-                "Mercedes-Benz Stadium",
-                "Hard Rock Stadium",
-                "BC Place",
-                "BMO Field",
-                "Estádio Azteca"
-        };
-
-        return estadios[indice % estadios.length];
+    private Estadio buscarOuCriarEstadio(String nomeEstadio) {
+        return estadioRepository.findByNome(nomeEstadio)
+                .orElseGet(() -> {
+                    Estadio estadio = new Estadio();
+                    estadio.setNome(nomeEstadio);
+                    estadio.setCidade(null);
+                    estadio.setPais(null);
+                    return estadioRepository.save(estadio);
+                });
     }
 
     private void criarJogoMataMata(
@@ -351,10 +370,10 @@ public class MataMataService {
             int mes,
             int dia,
             int hora,
-            int minuto
+            int minuto,
+            int ordemMataMata
     ) {
-        Estadio estadio = estadioRepository.findByNome(nomeEstadio)
-                .orElseThrow(() -> new BusinessException("Estádio não encontrado: " + nomeEstadio));
+        Estadio estadio = buscarOuCriarEstadio(nomeEstadio);
 
         Jogo jogo = new Jogo();
         jogo.setTimeCasa(casa);
@@ -368,7 +387,18 @@ public class MataMataService {
         jogo.setGolsVisitante(null);
         jogo.setPenaltisCasa(null);
         jogo.setPenaltisVisitante(null);
+        jogo.setOrdemMataMata(ordemMataMata);
 
         jogoRepository.save(jogo);
+    }
+
+    private record JogoMataMataConfig(
+            String nomeEstadio,
+            int ano,
+            int mes,
+            int dia,
+            int hora,
+            int minuto
+    ) {
     }
 }

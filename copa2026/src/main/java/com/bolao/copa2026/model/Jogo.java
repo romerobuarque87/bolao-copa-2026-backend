@@ -46,4 +46,6 @@ public class Jogo {
     private String grupo;
 
     private Boolean finalizado = false;
+
+    private Integer ordemMataMata;
 }

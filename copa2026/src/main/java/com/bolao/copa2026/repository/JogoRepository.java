@@ -17,6 +17,8 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 
     List<Jogo> findByFaseOrderByDataHoraAsc(FaseCopa fase);
 
+    List<Jogo> findByFaseOrderByOrdemMataMataAsc(FaseCopa fase);
+
     List<Jogo> findByGrupoOrderByDataHoraAsc(String grupo);
 
     List<Jogo> findByFaseAndGrupoOrderByDataHoraAsc(FaseCopa fase, String grupo);
