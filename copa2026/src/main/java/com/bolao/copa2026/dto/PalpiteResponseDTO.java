@@ -32,4 +32,6 @@ public class PalpiteResponseDTO {
     private String classificadoPalpiteSigla;
 
     private Integer pontosObtidos;
+
+    private Boolean palpiteOculto;
 }

@@ -228,27 +228,44 @@ public class PalpiteService {
                 .toList();
     }
 
-    public List<PalpiteResponseDTO> listarPalpitesEnviadosPorBolao(Long bolaoId, Long participanteBolaoId) {
-        ParticipanteBolao participanteBolao = participanteBolaoRepository
-                .findById(participanteBolaoId)
-                .orElseThrow(() -> new ResourceNotFoundException("Participante do bolao nao encontrado"));
+    public List<PalpiteResponseDTO> listarPalpitesEnviadosPorBolao(
+        Long bolaoId,
+        Long participanteBolaoId
+) {
+    ParticipanteBolao participanteVisualizador = participanteBolaoRepository
+            .findById(participanteBolaoId)
+            .orElseThrow(() ->
+                    new ResourceNotFoundException("Participante do bolao nao encontrado"));
 
-        if (!participanteBolao.getBolao().getId().equals(bolaoId)) {
-            throw new BusinessException("Este participante nao pertence ao bolao informado");
-        }
-
-        boolean ehAdmin = Boolean.TRUE.equals(participanteBolao.getUsuario().getAdministrador());
-
-        if (!ehAdmin && !Boolean.TRUE.equals(participanteBolao.getPalpitesEnviados())) {
-            throw new BusinessException("Voce so pode ver os palpites dos outros participantes depois de enviar os seus.");
-        }
-
-        return palpiteRepository
-                .findByParticipanteBolao_Bolao_IdAndParticipanteBolao_PalpitesEnviadosTrueOrderByParticipanteBolao_Usuario_NomeAscJogo_DataHoraAsc(bolaoId)
-                .stream()
-                .map(this::toResponseDTO)
-                .toList();
+    if (!participanteVisualizador.getBolao().getId().equals(bolaoId)) {
+        throw new BusinessException(
+                "Este participante nao pertence ao bolao informado");
     }
+
+    boolean ehAdmin = Boolean.TRUE.equals(
+            participanteVisualizador.getUsuario().getAdministrador()
+    );
+
+    if (!ehAdmin &&
+            !Boolean.TRUE.equals(participanteVisualizador.getPalpitesEnviados())) {
+        throw new BusinessException(
+                "Voce so pode ver os palpites dos outros participantes depois de enviar os seus."
+        );
+    }
+
+    return palpiteRepository
+            .findByParticipanteBolao_Bolao_IdAndParticipanteBolao_PalpitesEnviadosTrueOrderByParticipanteBolao_Usuario_NomeAscJogo_DataHoraAsc(
+                    bolaoId
+            )
+            .stream()
+            .map(palpite ->
+                    toResponseDTOComControleDeVisualizacao(
+                            palpite,
+                            participanteVisualizador
+                    )
+            )
+            .toList();
+}
 
     private Selecao buscarClassificadoPalpiteSeNecessario(
             Jogo jogo,
@@ -398,6 +415,48 @@ public class PalpiteService {
 
     private LocalDateTime agoraEmBrasilia() {
         return LocalDateTime.now(FUSO_BRASILIA);
+    }
+
+    private PalpiteResponseDTO toResponseDTOComControleDeVisualizacao(
+        Palpite palpite,
+        ParticipanteBolao participanteVisualizador
+) {
+    PalpiteResponseDTO response = toResponseDTO(palpite);
+
+    boolean ehAdmin = Boolean.TRUE.equals(
+            participanteVisualizador.getUsuario().getAdministrador()
+    );
+
+    boolean ehDonoDoPalpite =
+            palpite.getParticipanteBolao().getId()
+                    .equals(participanteVisualizador.getId());
+
+    LocalDateTime dataHoraJogo = palpite.getJogo().getDataHora();
+
+    boolean jogoJaComecou =
+            dataHoraJogo != null &&
+            !agoraEmBrasilia().isBefore(dataHoraJogo);
+
+    boolean podeVisualizar =
+            ehAdmin ||
+            ehDonoDoPalpite ||
+            jogoJaComecou;
+
+    if (!podeVisualizar) {
+        response.setGolsCasaPalpite(null);
+        response.setGolsVisitantePalpite(null);
+
+        response.setClassificadoPalpiteId(null);
+        response.setClassificadoPalpiteNome(null);
+        response.setClassificadoPalpiteSigla(null);
+
+        response.setPontosObtidos(null);
+        response.setPalpiteOculto(true);
+    } else {
+        response.setPalpiteOculto(false);
+    }
+
+    return response;
     }
 
     private PalpiteResponseDTO toResponseDTO(Palpite palpite) {
